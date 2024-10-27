@@ -1,31 +1,20 @@
 import pandas as pd
+import numpy as np
 
-# Function to clean and format the dataset
-def clean_and_format_dataset(df):
-    # 1. Show the number of missing values per column
-    missing_values = df.isnull().sum()
-    print("Missing Values Per Column:\n", missing_values)
-    
-    # 2. Show columns with incorrect data types
-    incorrect_types = df.dtypes[df.dtypes == 'object']  # Assuming incorrect types are non-numeric for numeric columns
-    print("\nColumns with Incorrect Data Types:\n", incorrect_types)
+def downsize_dataset(file_path, output_path, sample_fraction=0.03):
+    # Load the dataset
+    data = pd.read_csv(file_path)
 
-    # 3. Convert data types where applicable (this step assumes non-numeric columns need conversion)
-    for col in df.columns:
-        try:
-            df[col] = pd.to_numeric(df[col], errors='ignore')
-        except:
-            continue
-    
-    # Return the cleaned dataset
-    return df
+    # Downsize by sampling 3% of the dataset
+    downsized_data = data.sample(frac=sample_fraction, random_state=42)
 
-# Load the dataset (replace with the correct file path)
-file_path = 'your_dataset.csv'
-dataset = pd.read_csv(file_path)
+    # Save the downsized dataset to a new file
+    downsized_data.to_csv(output_path, index=False)
 
-# Apply the cleaning function
-cleaned_dataset = clean_and_format_dataset(dataset)
+    print(f"Downsized dataset saved to {output_path} with {len(downsized_data)} records out of {len(data)}.")
+    return downsized_data
 
-# Save the cleaned dataset if necessary
-cleaned_dataset.to_csv('cleaned_dataset.csv', index=False)
+# Example usage
+file_path = 'dataset.csv'   # Replace with actual dataset path
+output_path = 'downsized_dataset.csv'   # Replace with desired output path
+downsized_data = downsize_dataset(file_path, output_path)
